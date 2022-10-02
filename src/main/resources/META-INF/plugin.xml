@@ -5,6 +5,8 @@
     <vendor>kikimanjaro</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.java</depends>
+    <depends>org.jetbrains.kotlin</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.github.kikimanjaro.stickyscroll.services.MyApplicationService"/>
