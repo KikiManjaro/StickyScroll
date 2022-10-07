@@ -7,6 +7,9 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
+import com.intellij.ui.LightweightHint
+import java.awt.Color
+import javax.swing.BorderFactory
 
 class StickyPanelManager(
     val project: Project,
@@ -31,11 +34,14 @@ class StickyPanelManager(
         addTopLabels()
     }
 
-    fun addPanel(text: String, line: Int) {
-//        if (panels.isEmpty() || panels.last().text != text) {
-        this.panels.add(StickyPanel(editor, text, line))
-//        }
-//        refreshPanels()
+    fun addPanel(hint: LightweightHint, line: Int) {
+        for (panel in panels) {
+            if (panel.line == line) {
+                return
+            }
+        }
+        val sticky = StickyPanel(editor, hint, line)
+        this.panels.add(sticky)
     }
 
     fun clearPanelList() {
@@ -44,16 +50,18 @@ class StickyPanelManager(
     }
 
     fun addTopLabels() {
-        for (label in panels) {
-            fem.addTopComponent(textEditor, label)
-            label.parent
+        panels.forEachIndexed { index, sticky ->
+            fem.addTopComponent(textEditor, sticky.hint.component)
+            if (index == panels.size - 1) {
+                sticky.hint.component.border = BorderFactory.createMatteBorder(0, 0, 3, 0, Color(30,30,30,90))
+            }
         }
     }
 
     fun removeTopLabels() {
         for (panel in panels) {
-            if (panel.parent != null) {
-                fem.removeTopComponent(textEditor, panel)
+            if (panel.hint.component != null) {
+                fem.removeTopComponent(textEditor, panel.hint.component)
             }
         }
     }
