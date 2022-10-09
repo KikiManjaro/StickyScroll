@@ -1,4 +1,4 @@
-package com.github.kikimanjaro.stickyscroll
+package com.github.kikimanjaro.stickyscroll.ui
 
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.ScrollType
@@ -15,9 +15,6 @@ import javax.swing.JPanel
 
 class StickyPanel(editor: EditorImpl, val hint: LightweightHint, val line: Int) {
     init {
-//        var darkerLayer = JLayer(hint.component)
-//        darkerLayer.background = Color(50,50,50,50)
-//        hint.component = darkerLayer
         hint.component.cursor = Cursor(Cursor.HAND_CURSOR)
         hint.component.putClientProperty(FileEditorManager.SEPARATOR_DISABLED, true)
         hint.component.addMouseListener(object : MouseListener {

@@ -1,6 +1,7 @@
-package com.github.kikimanjaro.stickyscroll
+package com.github.kikimanjaro.stickyscroll.services
 
 import com.github.kikimanjaro.stickyscroll.listeners.ScrollListener
+import com.github.kikimanjaro.stickyscroll.ui.StickyPanel
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -53,7 +54,7 @@ class StickyPanelManager(
         panels.forEachIndexed { index, sticky ->
             fem.addTopComponent(textEditor, sticky.hint.component)
             if (index == panels.size - 1) {
-                sticky.hint.component.border = BorderFactory.createMatteBorder(0, 0, 3, 0, Color(30,30,30,90))
+                sticky.hint.component.border = BorderFactory.createMatteBorder(0, 0, 3, 0, Color(30, 30, 30, 90))
             }
         }
     }
@@ -61,7 +62,7 @@ class StickyPanelManager(
     fun removeTopLabels() {
         for (panel in panels) {
             if (panel.hint.component != null) {
-                fem.removeTopComponent(textEditor, panel.hint.component)
+                runCatching { fem.removeTopComponent(textEditor, panel.hint.component) }
             }
         }
     }

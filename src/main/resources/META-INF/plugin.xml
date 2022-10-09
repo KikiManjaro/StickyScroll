@@ -9,8 +9,7 @@
     <depends>org.jetbrains.kotlin</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.kikimanjaro.stickyscroll.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.kikimanjaro.stickyscroll.services.MyProjectService"/>
+        <applicationConfigurable instance="com.github.kikimanjaro.stickyscroll.config.StickyScrollConfigurable" />
     </extensions>
 
     <applicationListeners>

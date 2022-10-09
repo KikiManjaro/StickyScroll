@@ -1,4 +1,4 @@
-package com.github.kikimanjaro.stickyscroll.listeners;
+package com.github.kikimanjaro.stickyscroll.ui;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
