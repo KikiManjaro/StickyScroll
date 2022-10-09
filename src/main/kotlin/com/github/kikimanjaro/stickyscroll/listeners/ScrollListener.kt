@@ -34,43 +34,42 @@ class ScrollListener(val stickyPanelManager: StickyPanelManager) : VisibleAreaLi
 
 
         val positionToOffset = editor.logicalPositionToOffset(logicalPosition);
-
         val document = editor.document
-        val psiFile: PsiFile? =
-            PsiDocumentManager.getInstance(stickyPanelManager.project).getPsiFile(document)
-        val currentElement = psiFile?.findElementAt(positionToOffset - 1)
-
-        val parentMarshaller = PsiParentMarshallerManager.getParentMarshaller(psiFile?.language)
-
-        val parents = parentMarshaller?.getParents(currentElement)
-        parents?.toList()
         stickyPanelManager.clearPanelList()
-        var yDelta = 0
-        if (parents != null) {
-            for (parent in parents.toList().reversed().take(ConfigInstance.state.maxLine)) {
-                val parentStartOffset = parent.startOffset
-                val parentLine = document.getLineNumber(parentStartOffset)
+        if (document.getLineNumber(positionToOffset) > 0) {
+            val psiFile: PsiFile? =
+                PsiDocumentManager.getInstance(stickyPanelManager.project).getPsiFile(document)
+            val currentElement = psiFile?.findElementAt(positionToOffset - 1)
+
+            val parentMarshaller = PsiParentMarshallerManager.getParentMarshaller(psiFile?.language)
+
+            val parents = parentMarshaller?.getParents(currentElement)
+            parents?.toList()
+            var yDelta = 0
+            if (parents != null) {
+                for (parent in parents.toList().reversed().take(ConfigInstance.state.maxLine)) {
+                    val parentStartOffset = parent.startOffset
+                    val parentLine = document.getLineNumber(parentStartOffset)
 //                val parentLine = parent.startLine(document)
 //                val parentEndLine = parent.endLine(document)
 //                val start = document.getLineStartOffset(parentLine);
-                val firstChildOffset = document.getLineEndOffset(parent.firstChild.endLine(document))
+                    val firstChildOffset = document.getLineEndOffset(parent.firstChild.endLine(document))
 //                val end = document.getLineEndOffset(parentLine)
-                val textRange = TextRange(parentStartOffset, firstChildOffset)
-                val realText = document.getText(textRange)
+                    val textRange = TextRange(parentStartOffset, firstChildOffset)
+                    val realText = document.getText(textRange)
 
-                val hint = MyEditorFragmentComponent.showEditorFragmentHint(
-                    editor,
-                    textRange,
-                    true,
-                    false,
-                    yDelta * editor.lineHeight
-                )
-                stickyPanelManager.addPanel(hint!!, parentLine)
-
-
+                    val hint = MyEditorFragmentComponent.showEditorFragmentHint(
+                        editor,
+                        textRange,
+                        true,
+                        false,
+                        yDelta * editor.lineHeight
+                    )
+                    stickyPanelManager.addPanel(hint!!, parentLine)
+                }
             }
+            stickyPanelManager.addTopLabels()
         }
-        stickyPanelManager.addTopLabels()
     }
 
     override fun dispose() {

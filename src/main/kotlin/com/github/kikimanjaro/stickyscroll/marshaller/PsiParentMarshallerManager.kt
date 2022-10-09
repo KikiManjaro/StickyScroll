@@ -7,14 +7,14 @@ class PsiParentMarshallerManager {
         private val defaultParentMarshaller = DefaultParentMarshaller()
         private val kotlinParentMarshaller = KotlinParentMarshaller()
         private val jsonParentMarshaller = JsonParentMarshaller()
-        private val pythonParentMarshaller = PythonParentMarshaller()
+        private val xmlParentMarshaller = XMLParentMarshaller()
         fun getParentMarshaller(language: Language?): PsiParentMarshaller? {
             if (language == Language.findLanguageByID("kotlin")) {
                 return kotlinParentMarshaller
             } else if (language == Language.findLanguageByID("JSON")) {
                 return jsonParentMarshaller
-            }else if (language == Language.findLanguageByID("python")) {
-                return pythonParentMarshaller
+            }else if (language?.baseLanguage == Language.findLanguageByID("XML")) {
+                return xmlParentMarshaller
             } else {
                 return defaultParentMarshaller
             }

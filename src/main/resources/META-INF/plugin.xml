@@ -2,14 +2,37 @@
 <idea-plugin>
     <id>com.github.kikimanjaro.stickyscroll</id>
     <name>StickyScroll</name>
-    <vendor>kikimanjaro</vendor>
+    <version>0.0.1</version>
+    <idea-version since-build="213.5744.223"/>
+    <vendor email="kylian.meulin@gmail.com">KikiManjaro</vendor>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.java</depends>
     <depends>org.jetbrains.kotlin</depends>
 
+    <description><![CDATA[
+        This plugins is an equivalent of Sticky Scroll from VSCode, it lets you know in which scope you’re currently scrolling.
+        <br>
+        <br>
+        Currently supported languages:
+        <li>
+        - Java
+        <li>
+        - Kotlin
+        <li>
+        - Json
+        <li>
+        - Any XML based language
+    ]]></description>
+
+    <change-notes><![CDATA[
+      <em>0.0.1 Beta</em><br>
+    ]]>
+    </change-notes>
+
+
     <extensions defaultExtensionNs="com.intellij">
-        <applicationConfigurable instance="com.github.kikimanjaro.stickyscroll.config.StickyScrollConfigurable" />
+        <applicationConfigurable instance="com.github.kikimanjaro.stickyscroll.config.StickyScrollConfigurable"/>
     </extensions>
 
     <applicationListeners>
