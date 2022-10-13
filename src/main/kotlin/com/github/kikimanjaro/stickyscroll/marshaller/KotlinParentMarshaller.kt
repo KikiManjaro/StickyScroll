@@ -5,8 +5,11 @@ import com.intellij.psi.util.parents
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtDeclarationWithBody
 
-class KotlinParentMarshaller : PsiParentMarshaller{
-    override fun getParents(element: PsiElement?): Sequence<PsiElement>? {
-        return element?.parents(false)?.filter { element -> element is KtDeclarationWithBody || element is KtClassOrObject }
+class KotlinParentMarshaller : PsiParentMarshaller, DefaultTextRangeMarshaller() {
+    override fun getParents(psiElement: PsiElement?): Sequence<PsiElement>? {
+        return kotlin.runCatching {
+            psiElement?.parents(false)
+                ?.filter { element -> element is KtDeclarationWithBody || element is KtClassOrObject }
+        }.getOrNull()
     }
 }

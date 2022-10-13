@@ -1,14 +1,16 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
-<idea-plugin>
+<idea-plugin require-restart="true">
     <id>com.github.kikimanjaro.stickyscroll</id>
     <name>StickyScroll</name>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <idea-version since-build="213.5744.223"/>
     <vendor email="kylian.meulin@gmail.com">KikiManjaro</vendor>
 
     <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.java</depends>
-    <depends>org.jetbrains.kotlin</depends>
+    <depends optional="true" config-file="com.github.kikimanjaro.stickyscroll-withJava.xml">com.intellij.java</depends>
+    <depends optional="true" config-file="com.github.kikimanjaro.stickyscroll-withKotlin.xml">org.jetbrains.kotlin</depends>
+    <depends optional="true" config-file="com.github.kikimanjaro.stickyscroll-withPython.xml">PythonCore</depends>
+    <depends optional="true" config-file="com.github.kikimanjaro.stickyscroll-withPython2.xml">Pythonid</depends>
 
     <description><![CDATA[
         This plugins is an equivalent of Sticky Scroll from VSCode, it lets you know in which scope you’re currently scrolling.
@@ -16,16 +18,19 @@
         <br>
         Currently supported languages:
         <li>
-        - Java
+        Java
         <li>
-        - Kotlin
+        Kotlin
         <li>
-        - Json
+        Json
         <li>
-        - Any XML based language
+        Any XML based language
+        <li>
+        Python
     ]]></description>
 
     <change-notes><![CDATA[
+      <em>0.0.2 Add Python support + minor fix</em><br>
       <em>0.0.1 Beta</em><br>
     ]]>
     </change-notes>

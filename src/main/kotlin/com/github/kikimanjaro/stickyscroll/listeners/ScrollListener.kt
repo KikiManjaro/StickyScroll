@@ -8,11 +8,8 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.event.VisibleAreaEvent
 import com.intellij.openapi.editor.event.VisibleAreaListener
-import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
-import org.jetbrains.kotlin.idea.editor.fixers.endLine
-import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import java.awt.Point
 
 class ScrollListener(val stickyPanelManager: StickyPanelManager) : VisibleAreaListener, Disposable {
@@ -26,8 +23,7 @@ class ScrollListener(val stickyPanelManager: StickyPanelManager) : VisibleAreaLi
     override fun visibleAreaChanged(e: VisibleAreaEvent) {
         var logicalPosition = editor.xyToLogicalPosition(
             Point(
-                editor.scrollingModel.visibleArea.width,
-                editor.scrollingModel.visibleArea.y
+                editor.scrollingModel.visibleArea.width, editor.scrollingModel.visibleArea.y
             )
         )
         runCatching { logicalPosition = LogicalPosition(logicalPosition.line - 1, logicalPosition.column) }
@@ -37,8 +33,7 @@ class ScrollListener(val stickyPanelManager: StickyPanelManager) : VisibleAreaLi
         val document = editor.document
         stickyPanelManager.clearPanelList()
         if (document.getLineNumber(positionToOffset) > 0) {
-            val psiFile: PsiFile? =
-                PsiDocumentManager.getInstance(stickyPanelManager.project).getPsiFile(document)
+            val psiFile: PsiFile? = PsiDocumentManager.getInstance(stickyPanelManager.project).getPsiFile(document)
             val currentElement = psiFile?.findElementAt(positionToOffset - 1)
 
             val parentMarshaller = PsiParentMarshallerManager.getParentMarshaller(psiFile?.language)
@@ -47,25 +42,14 @@ class ScrollListener(val stickyPanelManager: StickyPanelManager) : VisibleAreaLi
             parents?.toList()
             var yDelta = 0
             if (parents != null) {
+                yDelta += 1
                 for (parent in parents.toList().reversed().take(ConfigInstance.state.maxLine)) {
-                    val parentStartOffset = parent.startOffset
-                    val parentLine = document.getLineNumber(parentStartOffset)
-//                val parentLine = parent.startLine(document)
-//                val parentEndLine = parent.endLine(document)
-//                val start = document.getLineStartOffset(parentLine);
-                    val firstChildOffset = document.getLineEndOffset(parent.firstChild.endLine(document))
-//                val end = document.getLineEndOffset(parentLine)
-                    val textRange = TextRange(parentStartOffset, firstChildOffset)
-                    val realText = document.getText(textRange)
+                   val result = parentMarshaller.getTextRangeAndStartLine(parent, document)
 
                     val hint = MyEditorFragmentComponent.showEditorFragmentHint(
-                        editor,
-                        textRange,
-                        true,
-                        false,
-                        yDelta * editor.lineHeight
+                        editor, result.first, true, false, yDelta * editor.lineHeight
                     )
-                    stickyPanelManager.addPanel(hint!!, parentLine)
+                    hint?.let { stickyPanelManager.addPanel(it, result.second) }
                 }
             }
             stickyPanelManager.addTopLabels()
