@@ -32,7 +32,6 @@ class StickyScrollConfigurable : BoundSearchableConfigurable("StickyScroll", "co
                 comboBox(DefaultComboBoxModel(arrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)))
                     .label(message("settings.maxLine"))
                     .bindItem(config::maxLine)
-//                    .bindItem(config::maxLine.toNullableProperty())
                     .accessibleName(message("settings.maxLine"))
                     .applyToComponent { addMouseWheelListener(scrollListener) }
             }.bottomGap(BottomGap.SMALL)
