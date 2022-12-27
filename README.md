@@ -2,6 +2,8 @@
 
 StickyScroll plugin for Jetbrains IDE
 
+This plugins is an equivalent of Sticky Scroll from VSCode, it lets you know in which scope you’re currently scrolling.
+
 [![Version](https://img.shields.io/jetbrains/plugin/v/20114-stickyscroll)](https://plugins.jetbrains.com/plugin/20114-stickyscroll/versions)
 [![Rating](https://img.shields.io/jetbrains/plugin/r/rating/20114-stickyscroll)](https://plugins.jetbrains.com/plugin/20114-stickyscroll/reviews)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/20114-stickyscroll)](https://plugins.jetbrains.com/plugin/20114-stickyscroll)
@@ -10,7 +12,7 @@ https://user-images.githubusercontent.com/59285425/209567993-2ba8239f-1d19-4037-
 
 ## Informations
 
-This plugins is an equivalent of Sticky Scroll from VSCode, it lets you know in which scope you’re currently scrolling.
+The StickyScroll plugin is a tool for Jetbrains IDEs that allows users to see in which scope they are currently scrolling while using the editor. It is an implementation of a feature called "sticky code" that is available in Visual Studio Code (VSCode). The plugin is written in a combination of Kotlin and Java programming languages. It is intended to make it easier for users to navigate and understand their code while working in Jetbrains IDEs.
 
 ## Contributing
 
