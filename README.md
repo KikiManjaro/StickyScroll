@@ -1,3 +1,7 @@
+# WARNING:
+**This plugin was created as a proof of concept to provide users with a functionality related to the Sticky Scroll feature in VSCode. However, it's important to note that due to the incorporation of [similar features directly into the software](https://youtrack.jetbrains.com/issue/IJPL-449/Sticky-Lines), this plugin will no longer be actively maintained. While it served its purpose during its development phase, it's now redundant given the native capabilities of the IDE. We appreciate the support and interest shown towards this project. Thank you!**
+
+
 # <img align="center" src="https://plugins.jetbrains.com/files/20114/238052/icon/pluginIcon.svg" data-canonical-src="https://plugins.jetbrains.com/files/20114/238052/icon/pluginIcon.svg" height="40" /> StickyScroll
 
 StickyScroll plugin for Jetbrains IDE
