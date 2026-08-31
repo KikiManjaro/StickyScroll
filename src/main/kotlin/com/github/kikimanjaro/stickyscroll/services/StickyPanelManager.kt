@@ -61,9 +61,7 @@ class StickyPanelManager(
 
     fun removeTopLabels() {
         for (panel in panels) {
-            if (panel.hint.component != null) {
-                runCatching { fem.removeTopComponent(textEditor, panel.hint.component) }
-            }
+            runCatching { fem.removeTopComponent(textEditor, panel.hint.component) }
         }
     }
 

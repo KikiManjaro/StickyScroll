@@ -23,8 +23,8 @@ class EditorPanelInjector(private val project: Project) : FileEditorManagerListe
     }
     override fun fileOpened(fem: FileEditorManager, virtualFile: VirtualFile) {
         for (textEditor in fem.getEditors(virtualFile).filterIsInstance<TextEditor>()) {
-            val editor = textEditor.editor as? EditorImpl
-            StickyPanelManager(project, editor!!, fem, textEditor)
+            val editor = textEditor.editor as? EditorImpl ?: continue
+            StickyPanelManager(project, editor, fem, textEditor)
         }
     }
 
