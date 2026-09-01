@@ -28,32 +28,38 @@ class ScrollListener(val stickyPanelManager: StickyPanelManager) : VisibleAreaLi
         )
         runCatching { logicalPosition = LogicalPosition(logicalPosition.line - 1, logicalPosition.column) }
 
-
-        val positionToOffset = editor.logicalPositionToOffset(logicalPosition);
+        // Guard: Jupyter notebooks (.ipynb) are not supported and crash the plugin (#3)
         val document = editor.document
-        stickyPanelManager.clearPanelList()
-        if (document.getLineNumber(positionToOffset) > 0) {
-            val psiFile: PsiFile? = PsiDocumentManager.getInstance(stickyPanelManager.project).getPsiFile(document)
-            val currentElement = psiFile?.findElementAt(positionToOffset - 1)
-
-            val parentMarshaller = PsiParentMarshallerManager.getParentMarshaller(psiFile?.language)
-
-            val parents = parentMarshaller?.getParents(currentElement)
-            parents?.toList()
-            var yDelta = 0
-            if (parents != null) {
-                yDelta += 1
-                for (parent in parents.toList().reversed().take(ConfigInstance.state.maxLine)) {
-                   val result = parentMarshaller.getTextRangeAndStartLine(parent, document)
-
-                    val hint = MyEditorFragmentComponent.showEditorFragmentHint(
-                        editor, result.first, true, false, yDelta * editor.lineHeight
-                    )
-                    hint?.let { stickyPanelManager.addPanel(it, result.second) }
-                }
-            }
-            stickyPanelManager.addTopLabels()
+        val psiFile: PsiFile? = PsiDocumentManager.getInstance(stickyPanelManager.project).getPsiFile(document)
+        if (psiFile != null && psiFile.name.endsWith(".ipynb", ignoreCase = true)) {
+            stickyPanelManager.clearPanelList()
+            return
         }
+
+        val positionToOffset = try {
+            editor.logicalPositionToOffset(logicalPosition)
+        } catch (_: Exception) {
+            stickyPanelManager.clearPanelList()
+            return
+        }
+        stickyPanelManager.clearPanelList()
+        if (positionToOffset < 0 || positionToOffset > document.textLength) return
+        if (document.getLineNumber(positionToOffset) <= 0) return
+
+        val currentElement = psiFile?.findElementAt((positionToOffset - 1).coerceAtLeast(0)) ?: return
+        val parentMarshaller = PsiParentMarshallerManager.getParentMarshaller(psiFile.language) ?: return
+        val parents = parentMarshaller.getParents(currentElement)?.toList().orEmpty()
+        if (parents.isEmpty()) return
+
+        var yDelta = 1
+        for (parent in parents.reversed().take(ConfigInstance.state.maxLine)) {
+            val result = runCatching { parentMarshaller.getTextRangeAndStartLine(parent, document) }.getOrNull() ?: continue
+            val hint = MyEditorFragmentComponent.showEditorFragmentHint(
+                editor, result.first, true, false, yDelta * editor.lineHeight
+            )
+            hint?.let { stickyPanelManager.addPanel(it, result.second) }
+        }
+        stickyPanelManager.addTopLabels()
     }
 
     override fun dispose() {

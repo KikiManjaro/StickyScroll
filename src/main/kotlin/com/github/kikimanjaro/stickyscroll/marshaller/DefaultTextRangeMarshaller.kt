@@ -9,17 +9,22 @@ import com.intellij.refactoring.suggested.startOffset
 abstract class DefaultTextRangeMarshaller : PsiParentMarshaller {
     override fun getTextRangeAndStartLine(element: PsiElement, document: Document): Pair<TextRange, Int> {
         val parentStartOffset = element.startOffset
-//        val parentLine = document.getLineNumber(parentStartOffset)
-//                val parentLine = parent.startLine(document)
-//                val parentEndLine = parent.endLine(document)
-//                val start = document.getLineStartOffset(parentLine);
-        val firstChildOffset: Int =
-            if (element.firstChild.startOffset == parentStartOffset && element.children.size > 1) {
-                element.firstChild.nextSibling.endOffset
+        val firstChild = element.firstChild
+        // Defensive: elements without children (e.g. synthetic PSI) — fall back to element's own range
+        if (firstChild == null) {
+            return Pair(element.textRange, document.getLineNumber(parentStartOffset))
+        }
+        val firstChildOffset: Int = runCatching {
+            val isSameOffset = firstChild.startOffset == parentStartOffset
+            val hasSibling = element.children.size > 1 && firstChild.nextSibling != null
+            if (isSameOffset && hasSibling) {
+                firstChild.nextSibling!!.endOffset
             } else {
-                element.firstChild.endOffset
+                firstChild.endOffset
             }
-        return Pair(TextRange(parentStartOffset, firstChildOffset), document.getLineNumber(parentStartOffset))
-//        val realText = document.getText(textRange)
+        }.getOrDefault(firstChild.endOffset)
+        // Clamp to document bounds
+        val safeEnd = firstChildOffset.coerceIn(parentStartOffset, document.textLength)
+        return Pair(TextRange(parentStartOffset, safeEnd), document.getLineNumber(parentStartOffset))
     }
 }

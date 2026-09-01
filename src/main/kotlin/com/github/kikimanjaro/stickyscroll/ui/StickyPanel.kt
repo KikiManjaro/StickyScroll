@@ -4,7 +4,6 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.util.Weighted
 import com.intellij.ui.LightweightHint
 import java.awt.Color
 import java.awt.Cursor
@@ -19,7 +18,7 @@ class StickyPanel(editor: EditorImpl, val hint: LightweightHint, val line: Int) 
         hint.component.putClientProperty(FileEditorManager.SEPARATOR_DISABLED, true)
         hint.component.addMouseListener(object : MouseListener {
             override fun mouseClicked(e: MouseEvent?) {
-                editor.scrollingModel.scrollTo(LogicalPosition(line, 0), ScrollType.RELATIVE);
+                editor.scrollingModel.scrollTo(LogicalPosition(line, 0), ScrollType.RELATIVE)
             }
 
             override fun mousePressed(e: MouseEvent?) {}
