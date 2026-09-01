@@ -28,13 +28,20 @@ class ScrollListener(val stickyPanelManager: StickyPanelManager) : VisibleAreaLi
         )
         runCatching { logicalPosition = LogicalPosition(logicalPosition.line - 1, logicalPosition.column) }
 
-
-        val positionToOffset = editor.logicalPositionToOffset(logicalPosition);
+        val safeLine = maxOf(0, logicalPosition.line)
+        val safePosition = LogicalPosition(safeLine, maxOf(0, logicalPosition.column))
+        val positionToOffset = try {
+            editor.logicalPositionToOffset(safePosition)
+        } catch (_: Exception) {
+            return
+        }
         val document = editor.document
         stickyPanelManager.clearPanelList()
         if (document.getLineNumber(positionToOffset) > 0) {
-            val psiFile: PsiFile? = PsiDocumentManager.getInstance(stickyPanelManager.project).getPsiFile(document)
-            val currentElement = psiFile?.findElementAt(positionToOffset - 1)
+            val psiFile: PsiFile? = runCatching {
+                PsiDocumentManager.getInstance(stickyPanelManager.project).getPsiFile(document)
+            }.getOrNull()
+            val currentElement = psiFile?.findElementAt((positionToOffset - 1).coerceAtLeast(0))
 
             val parentMarshaller = PsiParentMarshallerManager.getParentMarshaller(psiFile?.language)
 

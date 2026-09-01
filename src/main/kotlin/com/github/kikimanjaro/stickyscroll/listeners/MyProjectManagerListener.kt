@@ -7,7 +7,7 @@ import com.intellij.openapi.project.ProjectManagerListener
 internal class MyProjectManagerListener : ProjectManagerListener {
 
     override fun projectOpened(project: Project) {
-        project.messageBus.connect()
+        project.messageBus.connect(project)
             .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, EditorPanelInjector(project))
     }
 }
