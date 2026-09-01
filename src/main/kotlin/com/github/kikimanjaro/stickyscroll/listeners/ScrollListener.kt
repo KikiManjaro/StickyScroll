@@ -8,7 +8,6 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.event.VisibleAreaEvent
 import com.intellij.openapi.editor.event.VisibleAreaListener
-import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import java.awt.Point
@@ -22,99 +21,49 @@ class ScrollListener(val stickyPanelManager: StickyPanelManager) : VisibleAreaLi
     }
 
     override fun visibleAreaChanged(e: VisibleAreaEvent) {
-        try {
-            // Skip Jupyter notebooks and non-text files that can cause PSI crashes
-            val document = editor.document
-            val virtualFile = FileDocumentManager.getInstance().getFile(document)
-            if (virtualFile != null) {
-                val ext = virtualFile.extension?.lowercase()
-                val name = virtualFile.name.lowercase()
-                if (ext == "ipynb" || name.endsWith(".ipynb")) {
-                    stickyPanelManager.clearPanelList()
-                    return
-                }
-            }
-
-            var logicalPosition = editor.xyToLogicalPosition(
-                Point(
-                    editor.scrollingModel.visibleArea.width, editor.scrollingModel.visibleArea.y
-                )
+        var logicalPosition = editor.xyToLogicalPosition(
+            Point(
+                editor.scrollingModel.visibleArea.width, editor.scrollingModel.visibleArea.y
             )
-            runCatching { logicalPosition = LogicalPosition(logicalPosition.line - 1, logicalPosition.column) }
+        )
+        runCatching { logicalPosition = LogicalPosition(logicalPosition.line - 1, logicalPosition.column) }
 
-            val positionToOffset = try {
-                editor.logicalPositionToOffset(logicalPosition)
-            } catch (t: Throwable) {
-                return
+        val safeLine = maxOf(0, logicalPosition.line)
+        val safePosition = LogicalPosition(safeLine, maxOf(0, logicalPosition.column))
+        val positionToOffset = try {
+            editor.logicalPositionToOffset(safePosition)
+        } catch (_: Exception) {
+            return
+        }
+        val document = editor.document
+        stickyPanelManager.clearPanelList()
+        if (document.getLineNumber(positionToOffset) > 0) {
+            val psiFile: PsiFile? = runCatching {
+                PsiDocumentManager.getInstance(stickyPanelManager.project).getPsiFile(document)
+            }.getOrNull()
+            val currentElement = psiFile?.findElementAt((positionToOffset - 1).coerceAtLeast(0))
+
+            val parentMarshaller = PsiParentMarshallerManager.getParentMarshaller(psiFile?.language)
+
+            val parents = parentMarshaller?.getParents(currentElement)
+            parents?.toList()
+            var yDelta = 0
+            if (parents != null) {
+                yDelta += 1
+                for (parent in parents.toList().reversed().take(ConfigInstance.state.maxLine)) {
+                   val result = parentMarshaller.getTextRangeAndStartLine(parent, document)
+
+                    val hint = MyEditorFragmentComponent.showEditorFragmentHint(
+                        editor, result.first, true, false, yDelta * editor.lineHeight
+                    )
+                    hint?.let { stickyPanelManager.addPanel(it, result.second) }
+                }
             }
-
-            if (positionToOffset < 0 || positionToOffset > document.textLength) return
-
-            stickyPanelManager.clearPanelList()
-            if (document.getLineNumber(positionToOffset) > 0) {
-                val psiFile: PsiFile? = try {
-                    PsiDocumentManager.getInstance(stickyPanelManager.project).getPsiFile(document)
-                } catch (t: Throwable) {
-                    null
-                }
-                if (psiFile == null) return
-                if (!psiFile.isPhysical && psiFile.virtualFile == null) return
-
-                val offset = (positionToOffset - 1).coerceAtLeast(0)
-                val currentElement = try {
-                    psiFile.findElementAt(offset)
-                } catch (t: Throwable) {
-                    null
-                }
-
-                val parentMarshaller = try {
-                    PsiParentMarshallerManager.getParentMarshaller(psiFile.language)
-                } catch (t: Throwable) {
-                    null
-                } ?: return
-
-                val parents = try {
-                    parentMarshaller.getParents(currentElement)
-                } catch (t: Throwable) {
-                    null
-                } ?: return
-
-                var yDelta = 0
-                val parentList = try {
-                    parents.toList()
-                } catch (t: Throwable) {
-                    emptyList()
-                }
-                if (parentList.isNotEmpty()) {
-                    yDelta += 1
-                    for (parent in parentList.reversed().take(ConfigInstance.state.maxLine)) {
-                        val result = try {
-                            parentMarshaller.getTextRangeAndStartLine(parent, document)
-                        } catch (t: Throwable) {
-                            continue
-                        }
-                        val hint = try {
-                            MyEditorFragmentComponent.showEditorFragmentHint(
-                                editor, result.first, true, false, yDelta * editor.lineHeight
-                            )
-                        } catch (t: Throwable) {
-                            null
-                        }
-                        hint?.let { stickyPanelManager.addPanel(it, result.second) }
-                    }
-                }
-                stickyPanelManager.addTopLabels()
-            }
-        } catch (t: Throwable) {
-            try {
-                stickyPanelManager.clearPanelList()
-            } catch (_: Throwable) {}
+            stickyPanelManager.addTopLabels()
         }
     }
 
     override fun dispose() {
-        try {
-            editor.scrollingModel.removeVisibleAreaListener(this)
-        } catch (_: Throwable) {}
+        editor.scrollingModel.removeVisibleAreaListener(this)
     }
 }

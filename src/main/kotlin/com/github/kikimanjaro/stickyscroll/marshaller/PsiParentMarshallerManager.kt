@@ -1,7 +1,6 @@
 package com.github.kikimanjaro.stickyscroll.marshaller
 
 import com.intellij.lang.Language
-
 class PsiParentMarshallerManager {
     companion object {
         private val defaultParentMarshaller = DefaultParentMarshaller()
@@ -9,22 +8,21 @@ class PsiParentMarshallerManager {
         private val jsonParentMarshaller = JsonParentMarshaller()
         private val xmlParentMarshaller = XMLParentMarshaller()
         private val pythonParentMarshaller = PythonParentMarshaller()
-        private val rustParentMarshaller = RustParentMarshaller()
+
+        // Cached language lookups to avoid repeated findLanguageByID calls
+        private val kotlinLanguage by lazy { Language.findLanguageByID("kotlin") }
+        private val jsonLanguage by lazy { Language.findLanguageByID("JSON") }
+        private val xmlLanguage by lazy { Language.findLanguageByID("XML") }
+        private val pythonLanguage by lazy { Language.findLanguageByID("Python") }
+
         fun getParentMarshaller(language: Language?): PsiParentMarshaller? {
-            if (language == Language.findLanguageByID("kotlin")) {
-                return kotlinParentMarshaller
-            } else if (language == Language.findLanguageByID("JSON")) {
-                return jsonParentMarshaller
-            } else if (language?.baseLanguage == Language.findLanguageByID("XML")) {
-                return xmlParentMarshaller
-            } else if (language == Language.findLanguageByID("Python")) {
-                return pythonParentMarshaller
-            } else if (language == Language.findLanguageByID("Rust") || language == Language.findLanguageByID("rust")) {
-                return rustParentMarshaller
-            } else if (language?.id == "Rust" || language?.id == "rust") {
-                return rustParentMarshaller
-            } else {
-                return defaultParentMarshaller
+            if (language == null) return defaultParentMarshaller
+            return when {
+                language == kotlinLanguage -> kotlinParentMarshaller
+                language == jsonLanguage -> jsonParentMarshaller
+                language.baseLanguage == xmlLanguage -> xmlParentMarshaller
+                language == pythonLanguage -> pythonParentMarshaller
+                else -> defaultParentMarshaller
             }
         }
     }

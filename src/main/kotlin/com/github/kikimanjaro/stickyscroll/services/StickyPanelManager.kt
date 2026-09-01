@@ -36,11 +36,7 @@ class StickyPanelManager(
     }
 
     fun addPanel(hint: LightweightHint, line: Int) {
-        for (panel in panels) {
-            if (panel.line == line) {
-                return
-            }
-        }
+        if (panels.any { it.line == line }) return
         val sticky = StickyPanel(editor, hint, line)
         this.panels.add(sticky)
     }
