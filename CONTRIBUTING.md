@@ -1,7 +1,7 @@
 
 # Contributing Guidelines
 
-Thank you for your interest in contributing to the Mario Progress Bar ! Please read, understand, and agree to the following before making your contribution. Please also ensure you have read and agreed to the [Code of Conduct](CODE_OF_CONDUCT.md).
+Thank you for your interest in contributing to the StickyScroll ! Please read, understand, and agree to the following before making your contribution. Please also ensure you have read and agreed to the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 If you have any issues or questions, please, do not hesitate to contact [the maintainer](https://github.com/KikiManjaro) of this plugin.
 
@@ -16,15 +16,15 @@ open issue and have it assigned to you
     fork repository
             │
             v
-create feature/{issueNumber} or 
-{fix/issueNumber} branch based off
-   of the develop branch
+create feature/{issueNumber} or
+fix/{issueNumber} branch based off
+   of the main branch
             |
             v
     commit to fix issue
             │
             v
-open pull request to develop branch
+open pull request to main branch
             │
             v
        code review<────────┐
@@ -34,11 +34,8 @@ open pull request to develop branch
 approved, merged, issue closed
             |
             v
-release branch created from develop
-    by project maintainer
-            |
-            v
-release branch merged to master
+release created from main
+    by project maintainer (draft → published)
             │
             v
          deployed
@@ -64,5 +61,5 @@ Preferably you should be using [signed commits](https://help.github.com/en/artic
 
 ### Additional PR Information
 
-* This plugin is written using Java 8 and the IntelliJ SDK. 
+* This plugin is written in Kotlin + Java (JDK 17) on the IntelliJ Platform SDK. 
 * Please also do your best to follow the existing code style. You may be asked to refactor your code if it does not match the existing style, in the interest of consistency.
