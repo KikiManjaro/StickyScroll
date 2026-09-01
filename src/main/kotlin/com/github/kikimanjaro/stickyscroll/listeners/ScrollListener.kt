@@ -8,6 +8,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.event.VisibleAreaEvent
 import com.intellij.openapi.editor.event.VisibleAreaListener
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import java.awt.Point
@@ -21,48 +22,99 @@ class ScrollListener(val stickyPanelManager: StickyPanelManager) : VisibleAreaLi
     }
 
     override fun visibleAreaChanged(e: VisibleAreaEvent) {
-        var logicalPosition = editor.xyToLogicalPosition(
-            Point(
-                editor.scrollingModel.visibleArea.width, editor.scrollingModel.visibleArea.y
+        try {
+            // Skip Jupyter notebooks and non-text files that can cause PSI crashes
+            val document = editor.document
+            val virtualFile = FileDocumentManager.getInstance().getFile(document)
+            if (virtualFile != null) {
+                val ext = virtualFile.extension?.lowercase()
+                val name = virtualFile.name.lowercase()
+                if (ext == "ipynb" || name.endsWith(".ipynb")) {
+                    stickyPanelManager.clearPanelList()
+                    return
+                }
+            }
+
+            var logicalPosition = editor.xyToLogicalPosition(
+                Point(
+                    editor.scrollingModel.visibleArea.width, editor.scrollingModel.visibleArea.y
+                )
             )
-        )
-        runCatching { logicalPosition = LogicalPosition(logicalPosition.line - 1, logicalPosition.column) }
+            runCatching { logicalPosition = LogicalPosition(logicalPosition.line - 1, logicalPosition.column) }
 
-        // Guard: Jupyter notebooks (.ipynb) are not supported and crash the plugin (#3)
-        val document = editor.document
-        val psiFile: PsiFile? = PsiDocumentManager.getInstance(stickyPanelManager.project).getPsiFile(document)
-        if (psiFile != null && psiFile.name.endsWith(".ipynb", ignoreCase = true)) {
+            val positionToOffset = try {
+                editor.logicalPositionToOffset(logicalPosition)
+            } catch (t: Throwable) {
+                return
+            }
+
+            if (positionToOffset < 0 || positionToOffset > document.textLength) return
+
             stickyPanelManager.clearPanelList()
-            return
-        }
+            if (document.getLineNumber(positionToOffset) > 0) {
+                val psiFile: PsiFile? = try {
+                    PsiDocumentManager.getInstance(stickyPanelManager.project).getPsiFile(document)
+                } catch (t: Throwable) {
+                    null
+                }
+                if (psiFile == null) return
+                if (!psiFile.isPhysical && psiFile.virtualFile == null) return
 
-        val positionToOffset = try {
-            editor.logicalPositionToOffset(logicalPosition)
-        } catch (_: Exception) {
-            stickyPanelManager.clearPanelList()
-            return
-        }
-        stickyPanelManager.clearPanelList()
-        if (positionToOffset < 0 || positionToOffset > document.textLength) return
-        if (document.getLineNumber(positionToOffset) <= 0) return
+                val offset = (positionToOffset - 1).coerceAtLeast(0)
+                val currentElement = try {
+                    psiFile.findElementAt(offset)
+                } catch (t: Throwable) {
+                    null
+                }
 
-        val currentElement = psiFile?.findElementAt((positionToOffset - 1).coerceAtLeast(0)) ?: return
-        val parentMarshaller = PsiParentMarshallerManager.getParentMarshaller(psiFile.language) ?: return
-        val parents = parentMarshaller.getParents(currentElement)?.toList().orEmpty()
-        if (parents.isEmpty()) return
+                val parentMarshaller = try {
+                    PsiParentMarshallerManager.getParentMarshaller(psiFile.language)
+                } catch (t: Throwable) {
+                    null
+                } ?: return
 
-        var yDelta = 1
-        for (parent in parents.reversed().take(ConfigInstance.state.maxLine)) {
-            val result = runCatching { parentMarshaller.getTextRangeAndStartLine(parent, document) }.getOrNull() ?: continue
-            val hint = MyEditorFragmentComponent.showEditorFragmentHint(
-                editor, result.first, true, false, yDelta * editor.lineHeight
-            )
-            hint?.let { stickyPanelManager.addPanel(it, result.second) }
+                val parents = try {
+                    parentMarshaller.getParents(currentElement)
+                } catch (t: Throwable) {
+                    null
+                } ?: return
+
+                var yDelta = 0
+                val parentList = try {
+                    parents.toList()
+                } catch (t: Throwable) {
+                    emptyList()
+                }
+                if (parentList.isNotEmpty()) {
+                    yDelta += 1
+                    for (parent in parentList.reversed().take(ConfigInstance.state.maxLine)) {
+                        val result = try {
+                            parentMarshaller.getTextRangeAndStartLine(parent, document)
+                        } catch (t: Throwable) {
+                            continue
+                        }
+                        val hint = try {
+                            MyEditorFragmentComponent.showEditorFragmentHint(
+                                editor, result.first, true, false, yDelta * editor.lineHeight
+                            )
+                        } catch (t: Throwable) {
+                            null
+                        }
+                        hint?.let { stickyPanelManager.addPanel(it, result.second) }
+                    }
+                }
+                stickyPanelManager.addTopLabels()
+            }
+        } catch (t: Throwable) {
+            try {
+                stickyPanelManager.clearPanelList()
+            } catch (_: Throwable) {}
         }
-        stickyPanelManager.addTopLabels()
     }
 
     override fun dispose() {
-        editor.scrollingModel.removeVisibleAreaListener(this)
+        try {
+            editor.scrollingModel.removeVisibleAreaListener(this)
+        } catch (_: Throwable) {}
     }
 }

@@ -22,9 +22,17 @@ class EditorPanelInjector(private val project: Project) : FileEditorManagerListe
         }
     }
     override fun fileOpened(fem: FileEditorManager, virtualFile: VirtualFile) {
+        // Skip Jupyter notebooks and other non-code files that lack a standard text editor
+        if (virtualFile.extension?.lowercase() == "ipynb" || virtualFile.name.lowercase().endsWith(".ipynb")) {
+            return
+        }
         for (textEditor in fem.getEditors(virtualFile).filterIsInstance<TextEditor>()) {
             val editor = textEditor.editor as? EditorImpl ?: continue
-            StickyPanelManager(project, editor, fem, textEditor)
+            try {
+                StickyPanelManager(project, editor, fem, textEditor)
+            } catch (t: Throwable) {
+                logger.warn("Failed to create StickyPanelManager for ${virtualFile.name}", t)
+            }
         }
     }
 
