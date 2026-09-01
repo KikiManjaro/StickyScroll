@@ -11,7 +11,7 @@
     <depends optional="true" config-file="com.github.kikimanjaro.stickyscroll-withKotlin.xml">org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="com.github.kikimanjaro.stickyscroll-withPython.xml">PythonCore</depends>
     <depends optional="true" config-file="com.github.kikimanjaro.stickyscroll-withPython2.xml">Pythonid</depends>
-    <depends optional="true" config-file="com.github.kikimanjaro.stickyscroll-withCSS.xml">com.intellij.css</depends>
+    <depends optional="true" config-file="com.github.kikimanjaro.stickyscroll-withCSharp.xml">com.intellij.csharp</depends>
 
     <description><![CDATA[
         This plugins is an equivalent of Sticky Scroll from VSCode, it lets you know in which scope you’re currently scrolling.
@@ -29,7 +29,7 @@
         <li>
         Python
         <li>
-        CSS
+        C#
     ]]></description>
 
     <change-notes><![CDATA[
