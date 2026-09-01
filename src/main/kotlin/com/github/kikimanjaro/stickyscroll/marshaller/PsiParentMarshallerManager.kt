@@ -4,23 +4,27 @@ import com.intellij.lang.Language
 
 class PsiParentMarshallerManager {
     companion object {
-        private val defaultParentMarshaller by lazy { DefaultParentMarshaller() }
-        private val kotlinParentMarshaller by lazy { try { KotlinParentMarshaller() } catch (t: Throwable) { null } }
-        private val jsonParentMarshaller by lazy { try { JsonParentMarshaller() } catch (t: Throwable) { null } }
-        private val xmlParentMarshaller by lazy { try { XMLParentMarshaller() } catch (t: Throwable) { null } }
-        private val pythonParentMarshaller by lazy { try { PythonParentMarshaller() } catch (t: Throwable) { null } }
-
+        private val defaultParentMarshaller = DefaultParentMarshaller()
+        private val kotlinParentMarshaller = KotlinParentMarshaller()
+        private val jsonParentMarshaller = JsonParentMarshaller()
+        private val xmlParentMarshaller = XMLParentMarshaller()
+        private val pythonParentMarshaller = PythonParentMarshaller()
+        private val typeScriptParentMarshaller = TypeScriptParentMarshaller()
         fun getParentMarshaller(language: Language?): PsiParentMarshaller? {
-            return try {
-                when {
-                    language == Language.findLanguageByID("kotlin") -> kotlinParentMarshaller
-                    language == Language.findLanguageByID("JSON") -> jsonParentMarshaller
-                    language?.baseLanguage == Language.findLanguageByID("XML") -> xmlParentMarshaller
-                    language == Language.findLanguageByID("Python") -> pythonParentMarshaller
-                    else -> defaultParentMarshaller
-                }
-            } catch (t: Throwable) {
-                try { defaultParentMarshaller } catch (_: Throwable) { null }
+            if (language == Language.findLanguageByID("kotlin")) {
+                return kotlinParentMarshaller
+            } else if (language == Language.findLanguageByID("JSON")) {
+                return jsonParentMarshaller
+            } else if (language?.baseLanguage == Language.findLanguageByID("XML")) {
+                return xmlParentMarshaller
+            } else if (language == Language.findLanguageByID("Python")) {
+                return pythonParentMarshaller
+            } else if (language == Language.findLanguageByID("TypeScript") || language == Language.findLanguageByID("typeScript")) {
+                return typeScriptParentMarshaller
+            } else if (language?.id == "TypeScript" || language?.id == "typeScript") {
+                return typeScriptParentMarshaller
+            } else {
+                return defaultParentMarshaller
             }
         }
     }
