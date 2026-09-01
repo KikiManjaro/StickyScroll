@@ -11,11 +11,25 @@
     <depends optional="true" config-file="com.github.kikimanjaro.stickyscroll-withKotlin.xml">org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="com.github.kikimanjaro.stickyscroll-withPython.xml">PythonCore</depends>
     <depends optional="true" config-file="com.github.kikimanjaro.stickyscroll-withPython2.xml">Pythonid</depends>
+    <depends optional="true" config-file="com.github.kikimanjaro.stickyscroll-withJS.xml">JavaScript</depends>
 
     <description><![CDATA[
-        VS Code Sticky Scroll for JetBrains IDEs — pins the current scope at the top of the editor.<br>
-        Supported: Java, Kotlin, Python, JSON, XML/HTML.<br>
-        See <a href="https://github.com/KikiManjaro/StickyScroll">GitHub</a> for roadmap and known issues.
+        This plugins is an equivalent of Sticky Scroll from VSCode, it lets you know in which scope you’re currently scrolling.
+        <br>
+        <br>
+        Currently supported languages:
+        <li>
+        Java
+        <li>
+        Kotlin
+        <li>
+        Json
+        <li>
+        Any XML based language
+        <li>
+        Python
+        <li>
+        TypeScript
     ]]></description>
 
     <change-notes><![CDATA[

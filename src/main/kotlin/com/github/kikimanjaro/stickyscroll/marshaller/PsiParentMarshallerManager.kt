@@ -9,19 +9,23 @@ class PsiParentMarshallerManager {
         private val jsonParentMarshaller = JsonParentMarshaller()
         private val xmlParentMarshaller = XMLParentMarshaller()
         private val pythonParentMarshaller = PythonParentMarshaller()
+        private val typeScriptParentMarshaller = TypeScriptParentMarshaller()
         fun getParentMarshaller(language: Language?): PsiParentMarshaller? {
-            if (language == null) return defaultParentMarshaller
-            // Kotlin
-            if (language.id.equals("kotlin", ignoreCase = true)) return kotlinParentMarshaller
-            // JSON
-            if (language.id.equals("JSON", ignoreCase = true)) return jsonParentMarshaller
-            // XML-based (html, xml, etc.)
-            if (language.baseLanguage?.id.equals("XML", ignoreCase = true)) return xmlParentMarshaller
-            // Python (covers both Python and Pythonid legacy)
-            if (language.id.equals("Python", ignoreCase = true) || language.id.equals("Pythonid", ignoreCase = true)) {
+            if (language == Language.findLanguageByID("kotlin")) {
+                return kotlinParentMarshaller
+            } else if (language == Language.findLanguageByID("JSON")) {
+                return jsonParentMarshaller
+            } else if (language?.baseLanguage == Language.findLanguageByID("XML")) {
+                return xmlParentMarshaller
+            } else if (language == Language.findLanguageByID("Python")) {
                 return pythonParentMarshaller
+            } else if (language == Language.findLanguageByID("TypeScript") || language == Language.findLanguageByID("typeScript")) {
+                return typeScriptParentMarshaller
+            } else if (language?.id == "TypeScript" || language?.id == "typeScript") {
+                return typeScriptParentMarshaller
+            } else {
+                return defaultParentMarshaller
             }
-            return defaultParentMarshaller
         }
     }
 }
