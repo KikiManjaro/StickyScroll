@@ -2,14 +2,31 @@ package com.github.kikimanjaro.stickyscroll.marshaller
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parents
-import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
-import com.jetbrains.python.psi.PyFile
 
 class PythonParentMarshaller : PsiParentMarshaller, DefaultTextRangeMarshaller() {
     override fun getParents(psiElement: PsiElement?): Sequence<PsiElement>? {
-        return psiElement?.parents(false)?.filter { element ->
-            runCatching { element is ScopeOwner && element !is PyFile }.getOrDefault(false)
+        return try {
+            psiElement?.parents(false)?.filter { element ->
+                try {
+                    isPythonScope(element)
+                } catch (t: Throwable) {
+                    false
+                }
+            }
+        } catch (t: Throwable) {
+            null
         }
     }
 
+    private fun isPythonScope(element: PsiElement): Boolean {
+        return try {
+            val scopeOwner = Class.forName("com.jetbrains.python.codeInsight.controlflow.ScopeOwner")
+            val pyFile = Class.forName("com.jetbrains.python.psi.PyFile")
+            scopeOwner.isInstance(element) && !pyFile.isInstance(element)
+        } catch (e: ClassNotFoundException) {
+            false
+        } catch (t: Throwable) {
+            false
+        }
+    }
 }
