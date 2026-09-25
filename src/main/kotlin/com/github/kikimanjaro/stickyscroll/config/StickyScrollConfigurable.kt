@@ -7,6 +7,7 @@ import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.toNullableProperty
 import java.awt.event.MouseWheelEvent
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JComboBox
@@ -31,7 +32,7 @@ class StickyScrollConfigurable : BoundSearchableConfigurable("StickyScroll", "co
             row {
                 comboBox(DefaultComboBoxModel(arrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)))
                     .label(message("settings.maxLine"))
-                    .bindItem(config::maxLine)
+                    .bindItem(config::maxLine.toNullableProperty())
                     .accessibleName(message("settings.maxLine"))
                     .applyToComponent { addMouseWheelListener(scrollListener) }
             }.bottomGap(BottomGap.SMALL)
