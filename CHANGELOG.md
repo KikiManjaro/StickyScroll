@@ -7,6 +7,8 @@
 - CI modernization (Gradle 8.5, Kotlin 1.9.22, Java 17, GitHub Actions v4)
 - Hardened scroll listener and marshallers against NPEs and Jupyter crashes
 - Documentation overhaul (README, CONTRIBUTING)
+### Fixed
+- Javadoc/KDoc and other leading comments are no longer pinned as part of the scope header ([#5](https://github.com/KikiManjaro/StickyScroll/issues/5))
 
 ## [0.0.2] - 2023-01-27
 ### Added
