@@ -63,11 +63,19 @@ tasks {
         gradleVersion = properties("gradleVersion")
     }
 
-//    patchPluginXml {
-//        version.set(properties("pluginVersion"))
-//        sinceBuild.set(properties("pluginSinceBuild"))
-//        untilBuild.set(properties("pluginUntilBuild"))
-//
+    // Sans ce bloc, la tâche ':patchPluginXml' n'a pas de 'sinceBuild' et
+    // ':listProductsReleases' échoue sur « Cannot query the value of task
+    // ':listProductsReleases' property 'sinceBuild' because it has no value available ».
+    // C'est ce qui faisait mourir l'étape « Export Properties » du CI avant « Run Tests »,
+    // lequel n'a donc jamais tourné. Les valeurs sont dans gradle.properties.
+    patchPluginXml {
+        version.set(properties("pluginVersion"))
+        sinceBuild.set(properties("pluginSinceBuild"))
+        untilBuild.set(properties("pluginUntilBuild"))
+
+        // Volontairement laissé désactivé : ces deux réglages substitueraient à la
+        // description du manifeste celle extraite du README, et les notes de version
+        // celles du CHANGELOG. À activer sciemment — ce n'est pas un correctif de build.
 //        // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
 //        pluginDescription.set(
 //            projectDir.resolve("README.md").readText().lines().run {
@@ -87,7 +95,7 @@ tasks {
 //                getOrNull(properties("pluginVersion")) ?: getLatest()
 //            }.toHTML()
 //        })
-//    }
+    }
 
     // Configure UI tests plugin
     // Read more: https://github.com/JetBrains/intellij-ui-test-robot
