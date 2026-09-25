@@ -3,6 +3,8 @@
 # StickyScroll Changelog
 
 ## [Unreleased]
+### Added
+- Go support: functions, methods, type declarations, structs and interfaces ([#12](https://github.com/KikiManjaro/StickyScroll/issues/12))
 ### Changed
 - CI modernization (Gradle 8.5, Kotlin 1.9.22, Java 17, GitHub Actions v4)
 - Hardened scroll listener and marshallers against NPEs and Jupyter crashes
