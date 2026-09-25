@@ -17,6 +17,8 @@ class ScrollListener(val stickyPanelManager: StickyPanelManager) : VisibleAreaLi
     val editor = stickyPanelManager.editor
 
     init {
+        // The listener is unregistered by the Disposable passed here, when stickyPanelManager is
+        // disposed (ScrollingModel#addVisibleAreaListener(VisibleAreaListener, Disposable))
         editor.scrollingModel.addVisibleAreaListener(this, stickyPanelManager)
     }
 
@@ -64,6 +66,9 @@ class ScrollListener(val stickyPanelManager: StickyPanelManager) : VisibleAreaLi
     }
 
     override fun dispose() {
-        editor.scrollingModel.removeVisibleAreaListener(this)
+        // Nothing to do: the listener was registered with stickyPanelManager as its Disposable, so
+        // the platform removes it when the panel manager is disposed. Removing it again here makes
+        // ScrollingModelImpl#removeVisibleAreaListener log an assertion failure ("Listener not
+        // found"), which fails any test running under TestLoggerFactory.
     }
 }
