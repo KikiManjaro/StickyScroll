@@ -8,12 +8,15 @@ class PsiParentMarshallerManager {
         private val jsonParentMarshaller = JsonParentMarshaller()
         private val xmlParentMarshaller = XMLParentMarshaller()
         private val pythonParentMarshaller = PythonParentMarshaller()
+        private val goParentMarshaller = GoParentMarshaller()
 
         // Cached language lookups to avoid repeated findLanguageByID calls
         private val kotlinLanguage by lazy { Language.findLanguageByID("kotlin") }
         private val jsonLanguage by lazy { Language.findLanguageByID("JSON") }
         private val xmlLanguage by lazy { Language.findLanguageByID("XML") }
         private val pythonLanguage by lazy { Language.findLanguageByID("Python") }
+        // Null when the Go plugin (org.jetbrains.plugins.go) is not installed, no Go support then
+        private val goLanguage by lazy { Language.findLanguageByID("go") }
 
         fun getParentMarshaller(language: Language?): PsiParentMarshaller? {
             if (language == null) return defaultParentMarshaller
@@ -22,6 +25,7 @@ class PsiParentMarshallerManager {
                 language == jsonLanguage -> jsonParentMarshaller
                 language.baseLanguage == xmlLanguage -> xmlParentMarshaller
                 language == pythonLanguage -> pythonParentMarshaller
+                language == goLanguage -> goParentMarshaller
                 else -> defaultParentMarshaller
             }
         }

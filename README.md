@@ -28,9 +28,10 @@ https://user-images.githubusercontent.com/59285425/209567993-2ba8239f-1d19-4037-
 | Java | ✅ Supported |
 | Kotlin | ✅ Supported |
 | Python | ✅ Supported |
+| Go | ✅ Supported |
 | JSON | ✅ Supported |
 | XML / HTML and other XML-based | ✅ Supported |
-| Go, Rust, C/C++, C#, JavaScript, TypeScript, CSS, Dart, PHP, YAML, F# | 🔲 Requested — contributions welcome (see open issues) |
+| Rust, C/C++, C#, JavaScript, TypeScript, CSS, Dart, PHP, YAML, F# | 🔲 Requested — contributions welcome (see open issues) |
 
 > Jupyter notebooks (`.ipynb`) are explicitly excluded to avoid crashes ([#3](https://github.com/KikiManjaro/StickyScroll/issues/3)).
 
